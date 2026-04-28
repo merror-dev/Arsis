@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -10,7 +11,7 @@ app.use(express.json()); // Importante: permite que a API entenda JSON
 app.use(cors());
 
 // LIGAÇÃO AO MONGO (Substitui <password> pela tua senha real do Atlas)
-const mongoURI = "mongodb+srv://db_admin:1234@arsis-bd.f1s3tlx.mongodb.net/?appName=Arsis-bd";
+const mongoURI = process.env.mongoURI;
 
 mongoose.connect(mongoURI)
   .then(() => console.log("✅ Ligado ao MongoDB com sucesso!"))
