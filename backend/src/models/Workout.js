@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const {ExerciseSchema} = require('../models/Exercise')
 const {WORKOUT_TYPES} = require('../utils/constants')
-const WorkoutType = require('../models/workoutType')
 
 const WorkoutSchema = new mongoose.Schema({
   user: {
@@ -13,8 +12,7 @@ const WorkoutSchema = new mongoose.Schema({
     required: true
   },
   type: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'WorkoutType',
+    type: String,
     required: true
   }
   

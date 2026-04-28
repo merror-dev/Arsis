@@ -20,6 +20,10 @@ const WorkoutTypeSchema = new mongoose.Schema({
   maxSeries: {
     type: Number,
     required: true
+  },
+  rest: {
+    type: Number,
+    required: true
   }
 });
 

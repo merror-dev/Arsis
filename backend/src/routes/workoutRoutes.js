@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const workoutController = require('../controllers/workoutController');
+const authMiddleware = require('../middlewares/auth');
+
+// auth
+router.use(authMiddleware);
 
 // Definimos o caminho relativo
 router.post('/', workoutController.createWorkout);

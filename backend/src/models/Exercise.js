@@ -5,13 +5,12 @@ const min_eazyness = 1
 const max_eazyness = 5
 
 const ExerciseSchema = new mongoose.Schema({
-  user:{
-    type: Number,
-    required: true
-  },
-  name: {
+ name: {
     type: String,
     required: true
+  },
+  description: {
+    type: String
   },
   type: {
     type: String,
@@ -54,8 +53,9 @@ const ExerciseSchema = new mongoose.Schema({
       }
     ]
   },
-  repeticions: {
+  repetitions: {
     type: Number,
+    default: null,
     validate: [
       {
         validator: function(value) {
@@ -70,10 +70,12 @@ const ExerciseSchema = new mongoose.Schema({
     ]
   },
   duration: {
-    type: Number
+    type: Number,
+    default: null
   },
   weight: {
-    type: Number
+    type: Number,
+    default: null
   }
 },{
   // Isto remove o __v (versão) e transforma _id em id no JSON final

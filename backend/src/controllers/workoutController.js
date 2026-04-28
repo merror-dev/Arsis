@@ -1,42 +1,55 @@
 const Workout = require('../models/Workout');
-
+const Exercise = require('../models/Exercise');
 
 
 // --- CREATE ---
 exports.createWorkout = async (req, res) => {
     try {
-        // Validação básica (Estilo JSR 303 do Spring)
-        const { exercicio, series } = req.body;
-        if (!exercicio || series <= 0) {
-            return res.status(400).json({ erro: "Dados de treino inválidos" });
+        // 1. Corrigido o nome e adicionado 'const'
+        const exercises = req.body.exercises;
+
+        if (!exercises || exercises.length === 0) {
+            return res.status(400).json({ message: "Error: A workout needs exercises" });
         }
 
-        const novoTreino = new Workout(req.body);
-        const treinoGuardado = await novoTreino.save();
-        res.status(201).json(treinoGuardado);
+        // 2. Usar loop for...of para poder dar 'return' corretamente
+        for (const exercise of exercises) {
+            if (exercise.repetitions === 0 || exercise.series === 0) {
+                return res.status(400).json({ 
+                    message: `Error on exercise ${exercise.name}. Repetitions or series can't be 0.` 
+                });
+            }
+        }
+
+        const newWorkout = new Workout(req.body);
+        const savedWorkout = await newWorkout.save();
+        res.status(201).json({message: "Workout created successfully!", record: savedWorkout});
+        
     } catch (err) {
-        res.status(400).json({ mensagem: "Erro ao criar treino", erro: err.message });
+        res.status(400).json({ message: "Error creating workout", error: err.message });
     }
 };
 
 // --- READ (ALL) ---
 exports.getAllWorkouts = async (req, res) => {
     try {
-        const treinos = await Workout.find().sort({ data: -1 }); // Mais recentes primeiro
-        res.json(treinos);
+        const workouts = await Workout.find().sort({ data: -1 }); // Mais recentes primeiro
+        
+	if (!workouts || workouts.length === 0) return res.json({message:"No workouts created..."});
+	res.json(workouts);
     } catch (err) {
-        res.status(500).json({ mensagem: "Erro ao procurar treinos", erro: err.message });
+        res.status(500).json({ message: "Error searching for workouts", error: err.message });
     }
 };
 
 // --- READ (ONE) ---
 exports.getWorkoutById = async (req, res) => {
     try {
-        const treino = await Workout.findById(req.params.id);
-        if (!treino) return res.status(404).json({ mensagem: "Treino não encontrado" });
-        res.json(treino);
+        const workout = await Workout.findById(req.params.id);
+        if (!workout) return res.status(404).json({ message: "Workout not found" });
+        res.json(workout);
     } catch (err) {
-        res.status(500).json({ mensagem: "ID inválido", erro: err.message });
+        res.status(500).json({ message: "Invalid ID", error: err.message });
     }
 };
 
@@ -45,25 +58,25 @@ exports.updateWorkout = async (req, res) => {
     try {
         // { new: true } faz com que o Mongoose devolva o objeto JÁ atualizado
         // { runValidators: true } garante que as regras de min/max/enum são verificadas no update
-        const treinoAtualizado = await Workout.findByIdAndUpdate(
+        const workoutUpdate = await Workout.findByIdAndUpdate(
             req.params.id, 
             req.body, 
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
-        if (!treinoAtualizado) return res.status(404).json({ mensagem: "Treino não encontrado" });
-        res.json(treinoAtualizado);
+        if (!workoutUpdate) return res.status(404).json({ message: "Workout not found" });
+        res.json({message: "Workout updated successfully!", record: workoutUpdate});
     } catch (err) {
-        res.status(400).json({ mensagem: "Erro na atualização", erro: err.message });
+        res.status(400).json({ message: "Error updating workout", error: err.message });
     }
 };
 
 // --- DELETE ---
 exports.deleteWorkout = async (req, res) => {
     try {
-        const treinoRemovido = await Workout.findByIdAndDelete(req.params.id);
-        if (!treinoRemovido) return res.status(404).json({ mensagem: "Treino não encontrado" });
-        res.json({ mensagem: "Treino removido com sucesso" });
+        const workoutDeleted = await Workout.findByIdAndDelete(req.params.id);
+        if (!workoutDeleted) return res.status(404).json({ message: "Workout not found" });
+        res.json({ message: "Workout removed successfully!" });
     } catch (err) {
-        res.status(500).json({ mensagem: "Erro ao remover", erro: err.message });
+        res.status(500).json({ message: "Error removing workout", error: err.message });
     }
 };
